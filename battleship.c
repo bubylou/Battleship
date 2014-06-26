@@ -34,7 +34,7 @@ void place(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
     for (i = 0; i <= 7; i++) {
         row = rand() % 8;
         column = rand() % 8;
-        if (comp_board[row][column] != '%') {
+        while (comp_board[row][column] != '%') {
             row = rand() % 8;
             column = rand() % 8;
         }
@@ -46,7 +46,7 @@ void place(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
         draw(temp_board, user_board);
         printf("Place your ship.\n");
         scanf("%d %d", &row, &column);
-        if (user_board[row][column] != '%') {
+        while (user_board[row][column] != '%') {
             printf("Try again.\n");
             scanf("%d %d", &row, &column);
         }
@@ -62,10 +62,12 @@ void fire(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
     row = rand() % 8;
     column = rand() % 8;
 
-    if (user_board[row][column] == 'X' || user_board[row][column] == 'O') {
+    while (user_board[row][column] == 'X' || user_board[row][column] == 'O') {
         row = rand() % 8;
         column = rand() % 8;
-    } else if (user_board[row][column] == '@') {
+    }
+
+    if (user_board[row][column] == '@') {
         user_board[row][column] = 'O';
     } else if (user_board[row][column] == '%') {
         user_board[row][column] = 'X';
@@ -74,13 +76,17 @@ void fire(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
     printf("Fire when ready.\n");
     scanf("%d %d", &row, &column);
 
-    if (comp_board[row][column] == 'X' || comp_board[row][column] == 'O') {
+    while (comp_board[row][column] == 'X' || comp_board[row][column] == 'O') {
         printf("Try again.\n");
         scanf("%d %d", &row, &column);
-    } else if (comp_board[row][column] == '@') {
-        comp_board[row][column], temp_board[row][column] = 'O';
+    }
+
+    if (comp_board[row][column] == '@') {
+        comp_board[row][column] = 'O';
+        temp_board[row][column] = 'O';
     } else if (comp_board[row][column] == '%') {
-        comp_board[row][column], temp_board[row][column] = 'X';
+        comp_board[row][column] = 'X';
+        temp_board[row][column] = 'X';
     }
 }
 
