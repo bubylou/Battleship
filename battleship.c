@@ -3,22 +3,28 @@
 #include <string.h>
 #include <time.h>
 
-void draw(char board[8][8])
+void draw(char comp_board[8][8], char user_board[8][8])
 {
     int i, j;
 
-    printf("  0 1 2 3 4 5 6 7\n");
+    printf("       You                 Computer\n");
+    printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 
     for (i = 0; i <= 7; i++) {
         printf("%d ", i);
         for (j = 0; j <= 7; j++) {
-            printf("%c ", board[i][j]);
+            printf("%c ", user_board[i][j]);
+        }
+
+        printf("%d   %d ", i, i);
+        for (j = 0; j <= 7; j++) {
+            printf("%c ", comp_board[i][j]);
         }
 
         printf("%d\n", i);
     }
 
-    printf("  0 1 2 3 4 5 6 7\n");
+    printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 }
 
 void place(char comp_board[8][8], char user_board[8][8])
@@ -37,7 +43,7 @@ void place(char comp_board[8][8], char user_board[8][8])
     }
 
     for (i = 0; i <= 7; i++) {
-        draw(user_board);
+        draw(comp_board, user_board);
         printf("Place your ship.\n");
         scanf("%d %d", &row, &column);
         if (user_board[row][column] != '%') {
@@ -116,11 +122,7 @@ int main(void)
     place(comp_board, user_board);
 
     while (winner(user_board) == 0 && winner(comp_board) == 0) {
-        printf("\nComputer\n");
-        draw(comp_board);
-        printf("--------------------");
-        printf("\nYou\n");
-        draw(user_board);
+        draw(comp_board, user_board);
         fire(comp_board, user_board);
     }
 
