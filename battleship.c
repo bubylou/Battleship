@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-void draw(char comp_board[8][8], char user_board[8][8])
+void draw(char temp_board[8][8], char user_board[8][8])
 {
     int i, j;
 
@@ -18,7 +18,7 @@ void draw(char comp_board[8][8], char user_board[8][8])
 
         printf("%d   %d ", i, i);
         for (j = 0; j <= 7; j++) {
-            printf("%c ", comp_board[i][j]);
+            printf("%c ", temp_board[i][j]);
         }
 
         printf("%d\n", i);
@@ -27,7 +27,7 @@ void draw(char comp_board[8][8], char user_board[8][8])
     printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 }
 
-void place(char comp_board[8][8], char user_board[8][8])
+void place(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
 {
     int i, row, column;
 
@@ -43,7 +43,7 @@ void place(char comp_board[8][8], char user_board[8][8])
     }
 
     for (i = 0; i <= 7; i++) {
-        draw(comp_board, user_board);
+        draw(temp_board, user_board);
         printf("Place your ship.\n");
         scanf("%d %d", &row, &column);
         if (user_board[row][column] != '%') {
@@ -55,7 +55,7 @@ void place(char comp_board[8][8], char user_board[8][8])
     }
 }
 
-void fire(char comp_board[8][8], char user_board[8][8])
+void fire(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
 {
     int row, column;
 
@@ -78,9 +78,9 @@ void fire(char comp_board[8][8], char user_board[8][8])
         printf("Try again.\n");
         scanf("%d %d", &row, &column);
     } else if (comp_board[row][column] == '@') {
-        comp_board[row][column] = 'O';
+        comp_board[row][column], temp_board[row][column] = 'O';
     } else if (comp_board[row][column] == '%') {
-        comp_board[row][column] = 'X';
+        comp_board[row][column], temp_board[row][column] = 'X';
     }
 }
 
@@ -103,7 +103,7 @@ int main(void)
 {
     int i, row, column;
     char comp_board[8][8], user_board[8][8];
-    char base_board[8][8] = {'%', '%', '%', '%', '%', '%', '%', '%',
+    char temp_board[8][8] = {'%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%',
@@ -113,17 +113,17 @@ int main(void)
                              '%', '%', '%', '%', '%', '%', '%', '%'};
 
     srand(time(NULL));
-    memcpy(comp_board, base_board, sizeof(base_board));
-    memcpy(user_board, base_board, sizeof(base_board));
+    memcpy(comp_board, temp_board, sizeof(temp_board));
+    memcpy(user_board, temp_board, sizeof(temp_board));
 
     printf("Welcome to Battleship.\n");
     printf("% = Water  @ = Ship  X = Miss  O = Hit\n");
 
-    place(comp_board, user_board);
+    place(comp_board, user_board, temp_board);
 
     while (winner(user_board) == 0 && winner(comp_board) == 0) {
-        draw(comp_board, user_board);
-        fire(comp_board, user_board);
+        draw(temp_board, user_board);
+        fire(comp_board, user_board, temp_board);
     }
 
     if (winner(comp_board) == 1) {
