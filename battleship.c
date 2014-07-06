@@ -3,22 +3,24 @@
 #include <string.h>
 #include <time.h>
 
-void draw(char temp_board[8][8], char user_board[8][8])
+char two_board[8][8], one_board[8][8], one_display[8][8], two_display[8][8];
+
+void draw(char a[8][8], char b[8][8])
 {
     int i, j;
 
     printf("       You                 Computer\n");
     printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 
-    for (i = 0; i <= 7; i++) {
+    for (i = 0; i < 8; i++) {
         printf("%d ", i);
-        for (j = 0; j <= 7; j++) {
-            printf("%c ", user_board[i][j]);
+        for (j = 0; j < 8; j++) {
+            printf("%c ", a[i][j]);
         }
 
         printf("%d   %d ", i, i);
-        for (j = 0; j <= 7; j++) {
-            printf("%c ", temp_board[i][j]);
+        for (j = 0; j < 8; j++) {
+            printf("%c ", b[i][j]);
         }
 
         printf("%d\n", i);
@@ -27,88 +29,106 @@ void draw(char temp_board[8][8], char user_board[8][8])
     printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 }
 
-void place(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
+void place(int players, int player, char board[8][8])
 {
-    int i, row, column;
+    int i, row, col;
 
-    for (i = 0; i <= 7; i++) {
-        row = rand() % 8;
-        column = rand() % 8;
-        while (comp_board[row][column] != '%') {
+    if (players == 1 && player == 2) {
+        for (i = 0; i < 8; i++) {
             row = rand() % 8;
-            column = rand() % 8;
+            col = rand() % 8;
+            while (board[row][col] != '%') {
+                row = rand() % 8;
+                col = rand() % 8;
+            }
+
+            board[row][col] = '@';
         }
+    } else {
+        for (i = 0; i < 8; i++) {
+            if (player == 1) {
+                draw(one_board, two_display);
+            } else if (player == 2) {
+                draw(one_display, two_board);
+            }
 
-        comp_board[row][column] = '@';
-    }
+            printf("Player %d, Place your ship.\n", player);
+            scanf("%d %d", &row, &col);
 
-    for (i = 0; i <= 7; i++) {
-        draw(temp_board, user_board);
-        printf("Place your ship.\n");
-        scanf("%d %d", &row, &column);
-        while (user_board[row][column] != '%') {
-            printf("Try again.\n");
-            scanf("%d %d", &row, &column);
+            while (board[row][col] != '%') {
+                printf("Try again.\n");
+                scanf("%d %d", &row, &col);
+            }
+
+            board[row][col] = '@';
         }
-
-        user_board[row][column] = '@';
     }
 }
 
-void fire(char comp_board[8][8], char user_board[8][8], char temp_board[8][8])
+void fire(int players, int player)
 {
-    int row, column;
+    int row, col;
 
-    row = rand() % 8;
-    column = rand() % 8;
-
-    while (user_board[row][column] == 'X' || user_board[row][column] == 'O') {
+    if (players == 1 && player == 2) {
         row = rand() % 8;
-        column = rand() % 8;
-    }
+        col = rand() % 8;
 
-    if (user_board[row][column] == '@') {
-        user_board[row][column] = 'O';
-    } else if (user_board[row][column] == '%') {
-        user_board[row][column] = 'X';
-    }
+        while (two_board[row][col] == 'X' || two_board[row][col] == 'O') {
+            row = rand() % 8;
+            col = rand() % 8;
+        }
 
-    printf("Fire when ready.\n");
-    scanf("%d %d", &row, &column);
+        if (two_board[row][col] == '@') {
+            two_board[row][col] = 'O';
+            two_display[row][col] = 'O';
+        } else if (two_board[row][col] == '%') {
+            two_board[row][col] = 'X';
+            two_display[row][col] = 'X';
+        }
+    } else {
+        draw(one_display, two_display);
 
-    while (comp_board[row][column] == 'X' || comp_board[row][column] == 'O') {
-        printf("Try again.\n");
-        scanf("%d %d", &row, &column);
-    }
+        printf("Player %d, Fire when ready.\n", player);
+        scanf("%d %d", &row, &col);
 
-    if (comp_board[row][column] == '@') {
-        comp_board[row][column] = 'O';
-        temp_board[row][column] = 'O';
-    } else if (comp_board[row][column] == '%') {
-        comp_board[row][column] = 'X';
-        temp_board[row][column] = 'X';
+        while (one_board[row][col] == 'X' || one_board[row][col] == 'O') {
+            printf("Try again.\n");
+            scanf("%d %d", &row, &col);
+        }
+
+        if (one_board[row][col] == '@') {
+            one_board[row][col] = 'O';
+            one_display[row][col] = 'O';
+        } else if (one_board[row][col] == '%') {
+            one_board[row][col] = 'X';
+            one_display[row][col] = 'X';
+        }
     }
 }
 
 int winner(char board[8][8])
 {
     int i, j;
+    int hits = 0;
 
-    for (i = 0; i <= 7; i++) {
-        for (j = 0; j <= 7; j++) {
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 8; j++) {
             if (board[i][j] == '@') {
                 return 0;
+                if (board[i][j] == 'O') {
+                    hits++;
+                    if (hits == 8) {
+                        return 1;
+                    }
+                }
             }
         }
     }
-
-    return 1;
 }
 
-int main(void)
+int main(int argc, char const* argv[])
 {
-    int i, row, column;
-    char comp_board[8][8], user_board[8][8];
+    int i, row, col, players, player;
     char temp_board[8][8] = {'%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%',
@@ -118,23 +138,34 @@ int main(void)
                              '%', '%', '%', '%', '%', '%', '%', '%',
                              '%', '%', '%', '%', '%', '%', '%', '%'};
 
+    memcpy(one_board, temp_board, sizeof(temp_board));
+    memcpy(two_board, temp_board, sizeof(temp_board));
+    memcpy(one_display, temp_board, sizeof(temp_board));
+    memcpy(two_display, temp_board, sizeof(temp_board));
+
     srand(time(NULL));
-    memcpy(comp_board, temp_board, sizeof(temp_board));
-    memcpy(user_board, temp_board, sizeof(temp_board));
 
     printf("Welcome to Battleship.\n");
     printf("% = Water  @ = Ship  X = Miss  O = Hit\n");
 
-    place(comp_board, user_board, temp_board);
-
-    while (winner(user_board) == 0 && winner(comp_board) == 0) {
-        draw(temp_board, user_board);
-        fire(comp_board, user_board, temp_board);
+    while (players != 1 && players != 2) {
+        printf("How many players are there? (1 or 2)\n");
+        scanf("%d", &players);
     }
 
-    if (winner(comp_board) == 1) {
+    for (i = 0; i < 8; i++) {
+        place(players, 1, one_board);
+        place(players, 2, two_board);
+    }
+
+    while (winner(one_board) == 0 && winner(two_board) == 0) {
+        fire(players, 1);
+        fire(players, 2);
+    }
+
+    if (winner(two_board) == 1) {
         printf("You Win.\n");
-    } else if (winner(user_board) == 1) {
+    } else if (winner(one_board) == 2) {
         printf("You Lose.\n");
     }
 
