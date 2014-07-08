@@ -73,27 +73,9 @@ void fire(int players, int player)
         row = rand() % 8;
         col = rand() % 8;
 
-        while (two_board[row][col] == 'X' || two_board[row][col] == 'O') {
+        while (one_board[row][col] == 'X' || one_board[row][col] == 'O') {
             row = rand() % 8;
             col = rand() % 8;
-        }
-
-        if (two_board[row][col] == '@') {
-            two_board[row][col] = 'O';
-            two_display[row][col] = 'O';
-        } else if (two_board[row][col] == '%') {
-            two_board[row][col] = 'X';
-            two_display[row][col] = 'X';
-        }
-    } else {
-        draw(one_display, two_display);
-
-        printf("Player %d, Fire when ready.\n", player);
-        scanf("%d %d", &row, &col);
-
-        while (one_board[row][col] == 'X' || one_board[row][col] == 'O') {
-            printf("Try again.\n");
-            scanf("%d %d", &row, &col);
         }
 
         if (one_board[row][col] == '@') {
@@ -102,6 +84,24 @@ void fire(int players, int player)
         } else if (one_board[row][col] == '%') {
             one_board[row][col] = 'X';
             one_display[row][col] = 'X';
+        }
+    } else {
+        draw(one_display, two_display);
+
+        printf("Player %d, Fire when ready.\n", player);
+        scanf("%d %d", &row, &col);
+
+        while (two_board[row][col] == 'X' || two_board[row][col] == 'O') {
+            printf("Try again.\n");
+            scanf("%d %d", &row, &col);
+        }
+
+        if (two_board[row][col] == '@') {
+            two_board[row][col] = 'O';
+            two_display[row][col] = 'O';
+        } else if (two_board[row][col] == '%') {
+            two_board[row][col] = 'X';
+            two_display[row][col] = 'X';
         }
     }
 }
@@ -153,10 +153,8 @@ int main(int argc, char const* argv[])
         scanf("%d", &players);
     }
 
-    for (i = 0; i < 8; i++) {
-        place(players, 1, one_board);
-        place(players, 2, two_board);
-    }
+    place(players, 1, one_board);
+    place(players, 2, two_board);
 
     while (winner(one_board) == 0 && winner(two_board) == 0) {
         fire(players, 1);
@@ -164,9 +162,9 @@ int main(int argc, char const* argv[])
     }
 
     if (winner(two_board) == 1) {
-        printf("You Win.\n");
-    } else if (winner(one_board) == 2) {
-        printf("You Lose.\n");
+        printf("Player 1 Wins.\n");
+    } else if (winner(one_board) == 1) {
+        printf("Player 2 Wins.\n");
     }
 
     return 0;
