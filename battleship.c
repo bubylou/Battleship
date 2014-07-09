@@ -3,13 +3,17 @@
 #include <string.h>
 #include <time.h>
 
-char two_board[8][8], one_board[8][8], one_display[8][8], two_display[8][8];
+struct data {
+    int boats;
+    char board[8][8];
+    char display[8][8];
+} playerone, playertwo;
 
 void draw(char a[8][8], char b[8][8])
 {
     int i, j;
 
-    printf("       You                 Computer\n");
+    printf("     Player #1             Player #2\n");
     printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
 
     for (i = 0; i < 8; i++) {
@@ -27,6 +31,8 @@ void draw(char a[8][8], char b[8][8])
     }
 
     printf("  0 1 2 3 4 5 6 7       0 1 2 3 4 5 6 7\n");
+    printf("      Boats: %d             Boats: %d\n",
+            playerone.boats, playertwo.boats);
 }
 
 void place(int players, int player, char board[8][8])
@@ -43,13 +49,14 @@ void place(int players, int player, char board[8][8])
             }
 
             board[row][col] = '@';
+            playertwo.boats++;
         }
     } else {
         for (i = 0; i < 8; i++) {
             if (player == 1) {
-                draw(one_board, two_display);
+                draw(playerone.board, playertwo.display);
             } else if (player == 2) {
-                draw(one_display, two_board);
+                draw(playerone.display, playertwo.board);
             }
 
             printf("Player %d, Place your ship.\n", player);
@@ -61,11 +68,14 @@ void place(int players, int player, char board[8][8])
             }
 
             board[row][col] = '@';
+
+            if (player == 1) playerone.boats++;
+            if (player == 2) playertwo.boats++;
         }
     }
 }
 
-void fire(int players, int player)
+void fire(int players, int player, char board[8][8], char display[8][8])
 {
     int row, col;
 
@@ -73,55 +83,38 @@ void fire(int players, int player)
         row = rand() % 8;
         col = rand() % 8;
 
-        while (one_board[row][col] == 'X' || one_board[row][col] == 'O') {
+        while (board[row][col] == 'X' || board[row][col] == 'O') {
             row = rand() % 8;
             col = rand() % 8;
         }
 
-        if (one_board[row][col] == '@') {
-            one_board[row][col] = 'O';
-            one_display[row][col] = 'O';
-        } else if (one_board[row][col] == '%') {
-            one_board[row][col] = 'X';
-            one_display[row][col] = 'X';
+        if (board[row][col] == '@') {
+            board[row][col] = 'O';
+            display[row][col] = 'O';
+            playerone.boats--;
+        } else if (board[row][col] == '%') {
+            board[row][col] = 'X';
+            display[row][col] = 'X';
         }
     } else {
-        draw(one_display, two_display);
+        draw(playerone.display, playertwo.display);
 
         printf("Player %d, Fire when ready.\n", player);
         scanf("%d %d", &row, &col);
 
-        while (two_board[row][col] == 'X' || two_board[row][col] == 'O') {
+        while (board[row][col] == 'X' || board[row][col] == 'O') {
             printf("Try again.\n");
             scanf("%d %d", &row, &col);
         }
 
-        if (two_board[row][col] == '@') {
-            two_board[row][col] = 'O';
-            two_display[row][col] = 'O';
-        } else if (two_board[row][col] == '%') {
-            two_board[row][col] = 'X';
-            two_display[row][col] = 'X';
-        }
-    }
-}
-
-int winner(char board[8][8])
-{
-    int i, j;
-    int hits = 0;
-
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8; j++) {
-            if (board[i][j] == '@') {
-                return 0;
-                if (board[i][j] == 'O') {
-                    hits++;
-                    if (hits == 8) {
-                        return 1;
-                    }
-                }
-            }
+        if (board[row][col] == '@') {
+            board[row][col] = 'O';
+            display[row][col] = 'O';
+            if (player == 1) playertwo.boats--;
+            if (player == 2) playerone.boats--;
+        } else if (board[row][col] == '%') {
+            board[row][col] = 'X';
+            display[row][col] = 'X';
         }
     }
 }
@@ -129,19 +122,19 @@ int winner(char board[8][8])
 int main(int argc, char const* argv[])
 {
     int i, row, col, players, player;
-    char temp_board[8][8] = {'%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%',
-                             '%', '%', '%', '%', '%', '%', '%', '%'};
+    char board[8][8] = {'%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%',
+                        '%', '%', '%', '%', '%', '%', '%', '%'};
 
-    memcpy(one_board, temp_board, sizeof(temp_board));
-    memcpy(two_board, temp_board, sizeof(temp_board));
-    memcpy(one_display, temp_board, sizeof(temp_board));
-    memcpy(two_display, temp_board, sizeof(temp_board));
+    memcpy(playerone.board, board, sizeof(board));
+    memcpy(playertwo.board, board, sizeof(board));
+    memcpy(playerone.display, board, sizeof(board));
+    memcpy(playertwo.display, board, sizeof(board));
 
     srand(time(NULL));
 
@@ -153,18 +146,19 @@ int main(int argc, char const* argv[])
         scanf("%d", &players);
     }
 
-    place(players, 1, one_board);
-    place(players, 2, two_board);
+    place(players, 1, playerone.board);
+    place(players, 2, playertwo.board);
 
-    while (winner(one_board) == 0 && winner(two_board) == 0) {
-        fire(players, 1);
-        fire(players, 2);
+    while (playerone.boats != 0 && playertwo.boats != 0) {
+        fire(players, 1, playertwo.board, playertwo.display);
+        fire(players, 2, playerone.board, playerone.display);
     }
 
-    if (winner(two_board) == 1) {
-        printf("Player 1 Wins.\n");
-    } else if (winner(one_board) == 1) {
-        printf("Player 2 Wins.\n");
+    if (playerone.boats == 0 && playertwo.boats == 0) {
+        printf("Tie.\n");
+    } else {
+        if (playertwo.boats == 0) printf("Player 1 Wins.\n");
+        if (playerone.boats == 0) printf("Player 2 Wins.\n");
     }
 
     return 0;
