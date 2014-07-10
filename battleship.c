@@ -89,12 +89,10 @@ void fire(int players, int player, char board[8][8], char display[8][8])
         }
 
         if (board[row][col] == '@') {
-            board[row][col] = 'O';
-            display[row][col] = 'O';
+            board[row][col] = display[row][col] = 'O';
             playerone.boats--;
         } else if (board[row][col] == '%') {
-            board[row][col] = 'X';
-            display[row][col] = 'X';
+            board[row][col] = display[row][col] = 'X';
         }
     } else {
         draw(playerone.display, playertwo.display);
@@ -108,13 +106,11 @@ void fire(int players, int player, char board[8][8], char display[8][8])
         }
 
         if (board[row][col] == '@') {
-            board[row][col] = 'O';
-            display[row][col] = 'O';
+            board[row][col] = display[row][col] = 'O';
             if (player == 1) playertwo.boats--;
             if (player == 2) playerone.boats--;
         } else if (board[row][col] == '%') {
-            board[row][col] = 'X';
-            display[row][col] = 'X';
+            board[row][col] = display[row][col] = 'X';
         }
     }
 }
